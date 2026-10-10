@@ -10,7 +10,18 @@ $actionUrl = $security->getTokenUrl(
 $backupFiles = \Widget\Backup::alloc()->listFiles();
 
 /** Adminer 数据库管理入口（已并入本站根目录，仅登录的管理员可进入） */
-$adminerUrl = \Typecho\Common::url('adminer.php', $options->rootUrl);
+$__qbDbConf = [];
+
+try {
+    $__qbDbConf = \Typecho\Db::get()->getConfig(\Typecho\Db::READ)->toArray();
+} catch (\Throwable $__qbDbEx) {
+    $__qbDbConf = [];
+}
+
+$adminerUrl = \Typecho\Common::url('adminer.php', $options->rootUrl)
+    . '?server=' . urlencode($__qbDbConf['host'] ?? '127.0.0.1')
+    . '&username=' . urlencode($__qbDbConf['user'] ?? '')
+    . '&db=' . urlencode($__qbDbConf['database'] ?? '');
 ?>
 
 <style>
@@ -169,7 +180,7 @@ $adminerUrl = \Typecho\Common::url('adminer.php', $options->rootUrl);
                             <dt>进去之后怎么手动备份</dt>
                             <dd>
                                 <ol>
-                                    <li>用数据库账号登录：服务器 <code>127.0.0.1</code>，用户名 <code>root</code>，密码 <code>123456l</code>，数据库 <code>typecho20240517</code>。</li>
+                                    <li>点开就已经在数据库里了，不用再填账号密码。左侧选中 <code>typecho20240517</code> 这个库。</li>
                                     <li>进入数据库后，点页面左上角菜单里的 <strong>Export / 导出</strong>。</li>
                                     <li>Output 选 <strong>save</strong>（直接下载文件），Format 保持 <strong>SQL</strong>。</li>
                                     <li>Database 选 <strong>DROP+CREATE</strong>，Tables 选 <strong>DROP+CREATE</strong>，Data 选 <strong>INSERT</strong>。</li>
@@ -182,7 +193,7 @@ $adminerUrl = \Typecho\Common::url('adminer.php', $options->rootUrl);
                             </dd>
                         </dl>
                         <p class="bk-hint bk-desc">
-                            这个入口只对<strong>已登录的管理员</strong>开放，别人打不开；就算打开了也还需要数据库密码。
+                            这个入口只对<strong>已登录的管理员</strong>开放，别人打不开；打开后不用再填数据库账号，直接就能管理。
                         </p>
                     </div>
                 </div>

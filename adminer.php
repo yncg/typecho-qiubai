@@ -91,6 +91,83 @@ if (isset($_GET['dump']) && isset($_POST['output'])) {
     }
 }
 
+/**
+ * 免登录直接进库。
+ * 能走到这里说明已经通过了上面的管理员校验，所以这里直接把数据库凭据带上，
+ * 省掉再填一次账号密码这一步——手机上那个登录页的"服务器"栏默认写着 localhost，
+ * 极容易把用户名填进去，导致一直登不进去。
+ * 只在本机 Adminer 尚无会话时注入一次；万一凭据不对，Adminer 会自己退回登录页。
+ */
+if (empty($_GET['file']) && PHP_SESSION_NONE === session_status()) {
+    $__qbDbConfig = null;
+
+    try {
+        $__qbDbConfig = \Typecho\Db::get()->getConfig(\Typecho\Db::READ)->toArray();
+    } catch (\Throwable $__qbDbException) {
+        $__qbDbConfig = null;
+    }
+
+    if (!empty($__qbDbConfig['database'])) {
+        session_cache_limiter('');
+        session_name('adminer_sid');
+
+        $__qbCookiePath = preg_replace('~\?.*~', '', $_SERVER['SCRIPT_NAME'] ?? '/adminer.php');
+        $__qbSecure = !empty($_SERVER['HTTPS']) && 0 !== strcasecmp((string) $_SERVER['HTTPS'], 'off');
+
+        if (PHP_VERSION_ID >= 70300) {
+            session_set_cookie_params([
+                'lifetime' => 0,
+                'path'     => $__qbCookiePath,
+                'domain'   => '',
+                'secure'   => $__qbSecure,
+                'httponly' => true,
+                'samesite' => 'lax',
+            ]);
+        } else {
+            session_set_cookie_params(0, $__qbCookiePath . '; SameSite=lax', '', $__qbSecure, true);
+        }
+
+        session_start();
+
+        $__qbFirstVisit = empty($_SESSION['db']);
+
+        /**
+         * 每次都把连接参数补进地址。
+         * Adminer 靠地址里的 server / username 判断"要连哪里"，
+         * 少了这两个它就当成新连接，又会弹登录页。
+         */
+        if (empty($_GET['server'])) {
+            $_GET['server'] = (string) $__qbDbConfig['host'];
+        }
+        if (empty($_GET['username'])) {
+            $_GET['username'] = (string) $__qbDbConfig['user'];
+        }
+
+        /** 首次进来时连库名一起带上，直接落到本站的库 */
+        if ($__qbFirstVisit && empty($_GET['db'])) {
+            $_GET['db'] = (string) $__qbDbConfig['database'];
+        }
+
+        /** 还没有会话、也没有正在提交登录表单时，自动补一份凭据，免去手填 */
+        if ($__qbFirstVisit && empty($_POST['auth'])) {
+            $__qbToken = random_int(1, 1000000);
+            $_SESSION['token'] = $__qbToken;
+
+            $__qbSalt = random_int(1, 1000000);
+            $_POST['token'] = ($__qbSalt ^ $__qbToken) . ':' . $__qbSalt;
+            $_POST['auth'] = [
+                'driver'   => 'server',
+                'server'   => (string) $__qbDbConfig['host'],
+                'username' => (string) $__qbDbConfig['user'],
+                'password' => (string) $__qbDbConfig['password'],
+                'db'       => (string) $__qbDbConfig['database'],
+            ];
+        }
+    }
+
+    unset($__qbDbConfig, $__qbCookiePath, $__qbSecure, $__qbFirstVisit, $__qbToken, $__qbSalt, $__qbDbException);
+}
+
 unset($__qbUser, $__qbOptions, $__qbRequest);
 
 if(isset($_GET["status"]))$_GET["variables"]=$_GET["status"];if(isset($_GET["import"]))$_GET["sql"]=$_GET["import"];const
