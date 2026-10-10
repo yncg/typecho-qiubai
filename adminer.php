@@ -51,6 +51,46 @@ if (!$__qbUser->hasLogin() || !$__qbUser->pass('administrator', true)) {
  */
 \Typecho\Response::getInstance()->beginSandbox();
 
+/**
+ * 导出请求特殊处理：
+ * Adminer 导出时边算边发，响应不带 Content-Length、走分块传输，
+ * 部分手机浏览器的下载器拿不到文件大小，会存成 0 字节的空文件。
+ * 这里把整份导出内容先缓冲到临时文件，结束后带上 Content-Length 一次性发出。
+ */
+if (isset($_GET['dump']) && isset($_POST['output'])) {
+    /** 告诉 Adminer 不要提前 flush，好让我们能算出长度 */
+    define('__QB_BUFFER_DUMP__', true);
+    $__qbDumpFile = tempnam(sys_get_temp_dir(), 'qbdump_');
+
+    if (false !== $__qbDumpFile) {
+        ob_start(function ($__qbChunk) use ($__qbDumpFile) {
+            if ('' !== $__qbChunk) {
+                file_put_contents($__qbDumpFile, $__qbChunk, FILE_APPEND);
+            }
+            return '';
+        });
+
+        register_shutdown_function(function () use ($__qbDumpFile) {
+            while (ob_get_level() > 0) {
+                ob_end_flush();
+            }
+
+            if (is_file($__qbDumpFile)) {
+                $__qbSize = filesize($__qbDumpFile);
+
+                if ($__qbSize > 0) {
+                    if (!headers_sent()) {
+                        header('Content-Length: ' . $__qbSize, true);
+                    }
+                    readfile($__qbDumpFile);
+                }
+
+                @unlink($__qbDumpFile);
+            }
+        });
+    }
+}
+
 unset($__qbUser, $__qbOptions, $__qbRequest);
 
 if(isset($_GET["status"]))$_GET["variables"]=$_GET["status"];if(isset($_GET["import"]))$_GET["sql"]=$_GET["import"];const
@@ -178,7 +218,7 @@ preg_replace('~\W~i','-',$W);}function
 table_status1($Q,$Od=false){$H=table_status($Q,$Od);return($H?reset($H):array("Name"=>$Q));}function
 column_foreign_keys($Q){$H=array();foreach(adminer()->foreignKeys($Q)as$o){foreach($o["source"]as$W)$H[$W][]=$o;}return$H;}function
 fields_from_edit(){$H=array();foreach((array)$_POST["field_keys"]as$w=>$W){if($W!=""){$W=bracket_escape($W);$_POST["function"][$W]=$_POST["field_funs"][$w];$_POST["fields"][$W]=$_POST["field_vals"][$w];}}foreach((array)$_POST["fields"]as$w=>$W){$A=bracket_escape($w,true);$H[$A]=array("field"=>$A,"full_type"=>"","type"=>"","privileges"=>array("insert"=>1,"update"=>1,"where"=>1,"order"=>1),"null"=>true,"auto_increment"=>($A==driver()->primary),);}return$H;}function
-dump_headers($if,$uh=false){$H=adminer()->dumpHeaders($if,$uh);$Ji=$_POST["output"];if($Ji!="text"||$H=="tar"){$Mb=($Ji!="text"&&$Ji!="file"&&preg_match('~^[0-9a-z]+$~',$Ji)?".$Ji":"");header("Content-Disposition: attachment; filename=".adminer()->dumpFilename($if).".$H$Mb");}session_write_close();if(!ob_get_level())ob_start(null,4096);ob_flush();flush();return$H;}function
+dump_headers($if,$uh=false){$H=adminer()->dumpHeaders($if,$uh);$Ji=$_POST["output"];if($Ji!="text"||$H=="tar"){$Mb=($Ji!="text"&&$Ji!="file"&&preg_match('~^[0-9a-z]+$~',$Ji)?".$Ji":"");header("Content-Disposition: attachment; filename=".adminer()->dumpFilename($if).".$H$Mb");}session_write_close();if(!ob_get_level())ob_start(null,4096);if(!defined('__QB_BUFFER_DUMP__')){ob_flush();flush();}return$H;}function
 dump_csv(array$I){$Pm=$_POST["format"]=="tsv";foreach($I
 as$w=>$W){if(preg_match('~["\n]|^0[^.]|\.\d*0$|'.($Pm?'\t':'[,;]|^$').'~',$W))$I[$w]='"'.str_replace('"','""',$W).'"';}echo
 implode(($_POST["format"]=="csv"?",":($Pm?"\t":";")),$I)."\r\n";}function
