@@ -884,9 +884,8 @@ class Archive extends Contents
     public function theNext(string $format = '%s', ?string $default = null, array $custom = [])
     {
         $query = $this->select()->where(
-            'table.contents.created > ? AND table.contents.created < ?',
-            $this->created,
-            $this->options->time
+            'table.contents.created > ?',
+            $this->created
         )
             ->where('table.contents.status = ?', 'publish')
             ->where('table.contents.type = ?', $this->type)
