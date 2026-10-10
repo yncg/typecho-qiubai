@@ -1,0 +1,299 @@
+/**
+* 后台头部导航
+*/
+
+$border-nav: 1px solid #383D45;
+$color-nav-bg: #292D33;
+$color-nav-text-normal: #BBB;
+$color-nav-text-mute: #777;
+$color-nav-text-hover: #FFF;
+$color-nav-btn-hover: #202328;
+$color-nav-child-focus: #6DA1BB;
+
+.typecho-head-nav {
+  padding: 0 10px;
+  background: $color-nav-bg;
+  position: sticky;
+  top: 0;
+  display: flex;
+  z-index: 100;
+
+  a, .menu-bar summary {
+    padding: 0 20px;
+    height: 36px;
+    line-height: 36px;
+    color: $color-nav-text-normal;
+
+    &:focus,
+    &:hover {
+      color: $color-nav-text-hover;
+      text-decoration: none;
+    }
+  }
+
+  .menu-bar {
+    display: none;
+  }
+
+  menu {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    background: $color-nav-bg;
+  }
+
+  nav {
+    width: 100%;
+
+    & > menu {
+      display: flex;
+      position: relative;
+      width: 100%;
+
+      & > li {
+
+        &:first-child {
+          border-left: $border-nav;
+        }
+
+        > a {
+          display: block;
+          border-right: $border-nav;
+
+          &:hover, &:focus {
+            background: $color-nav-btn-hover;
+
+            & + menu {
+              display: flex;
+            }
+          }
+        }
+
+        &:not(.operate) {
+          &.focus > a {
+            background: $color-nav-btn-hover;
+            font-weight: bold;
+          }
+
+          &:hover > a {
+            background: $color-nav-btn-hover;
+          }
+        }
+
+        &:hover, &:focus-within, &:focus {
+          menu {
+            display: flex;
+          }
+        }
+
+        menu {
+          position: absolute;
+          top: 36px;
+          display: none;
+          flex-flow: column;
+          min-width: 160px;
+          max-width: 240px;
+          background: $color-nav-btn-hover;
+          z-index: 250;
+
+          & > li {
+            a {
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+              display: block;
+
+              &:hover,
+              &:focus {
+                background: $color-nav-bg;
+              }
+            }
+
+            &.focus a {
+              color: $color-nav-child-focus;
+              font-weight: bold;
+            }
+          }
+        }
+
+        &.operate {
+          flex: 1;
+          display: flex;
+          justify-content: flex-end;
+
+          a {
+            &:hover {
+              background-color: $color-nav-btn-hover;
+            }
+
+            &:first-child {
+              border-left: $border-nav;
+            }
+          }
+        }
+      }
+    }
+  }
+
+
+  // ===== 手机端 =====
+  // 顶栏就是普通文档流里的一行：左边「菜单」，右上角常驻「账户名 / 登出 / 网站」
+  // 点「菜单」在下方逐行展开菜单项，三个链接始终留在右上角、随时可点
+  @include screen(phone, max) {
+    padding: 0;
+    flex-flow: column;
+
+    nav {
+      display: flex;
+      flex-flow: row wrap;
+      align-items: stretch;
+      overflow: visible;
+      width: 100%;
+      position: relative;
+      top: auto;
+      background: transparent;
+
+      // 展开时同样只占一行高度，不再变成 70vw 的整屏抽屉
+      &:has(.menu-bar[open]) {
+        width: 100%;
+        height: auto;
+      }
+
+      > .menu-bar {
+        display: block;
+        flex: 0 0 auto;
+        order: 0;
+        position: static;
+        top: auto;
+        background: transparent;
+        z-index: auto;
+        font-size: 14px;
+
+        > summary {
+          display: block;
+          padding: 0 16px;
+          cursor: pointer;
+          list-style: none;
+
+          &::-webkit-details-marker {
+            display: none;
+          }
+        }
+
+        &[open] > summary {
+          border-bottom: $border-nav;
+        }
+
+        &[open] ~ menu {
+          display: flex;
+          flex-flow: row wrap;
+          display: contents;
+        }
+      }
+
+      // <menu> 不生成盒子，让它下面的 li 直接成为 nav 的 flex 项
+      // （先给一个降级写法，万一浏览器不认 display:contents 也不会散架）
+      > menu {
+        display: flex;
+        flex-flow: row wrap;
+        flex: 1 1 auto;
+        width: auto;
+        position: static;
+        background: transparent;
+        display: contents;
+
+        > li {
+          &:first-child {
+            border: none;
+          }
+
+          &:not(.operate) {
+            display: none;
+            order: 1;
+            flex: 0 0 100%;
+
+            > a {
+              border: none !important;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+            }
+
+            &.focus > a {
+              background: $color-nav-bg;
+            }
+
+            &:hover > a {
+              background: $color-nav-bg;
+            }
+
+            & > a {
+              pointer-events: auto;
+              cursor: pointer;
+            }
+          }
+
+          menu {
+            position: static;
+            border: $border-nav;
+            border-width: 1px 0;
+            display: flex;
+            min-width: auto;
+            max-width: none;
+          }
+
+          // 右上角常驻的三个链接
+          &.operate {
+            order: 0;
+            display: flex;
+            flex-flow: row;
+            justify-content: flex-end;
+            align-items: stretch;
+            flex: 0 0 auto;
+            margin-left: auto;
+            position: static;
+            top: auto;
+            right: auto;
+            background: transparent;
+
+            a {
+              display: block;
+              background: transparent;
+              padding: 0 12px;
+              max-width: 30vw;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+              border: none !important;
+              border-left: $border-nav !important;
+
+              &:first-child {
+                border-left: none !important;
+              }
+
+              &:hover {
+                background: $color-nav-btn-hover;
+              }
+            }
+          }
+        }
+      }
+
+      // 点开「菜单」：普通菜单项逐行展开
+      &:has(.menu-bar[open]) > menu > li:not(.operate) {
+        display: block;
+      }
+    }
+  }
+}
+
+// 顶栏回到文档流后不需要给 body 留出固定高度；展开菜单也不再锁死页面滚动
+@include screen(phone, max) {
+  body {
+    padding-top: 0;
+
+    &:has(.menu-bar[open]) {
+      overflow: visible;
+    }
+  }
+}
