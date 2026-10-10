@@ -1,0 +1,221 @@
+<?php
+
+namespace Widget;
+
+use Typecho\Common;
+use Typecho\Http\Client;
+use Typecho\Response;
+use Typecho\Widget\Exception;
+use Widget\Base\Contents;
+use Widget\Base\Options as BaseOptions;
+
+if (!defined('__TYPECHO_ROOT_DIR__')) {
+    exit;
+}
+
+/**
+ * 通用异步服务组件
+ *
+ * @author qining
+ * @category typecho
+ * @package Widget
+ */
+class Service extends BaseOptions implements ActionInterface
+{
+    /**
+     * 异步请求
+     *
+     * @var array
+     */
+    public array $asyncRequests = [];
+
+    /**
+     * 发送pingback实现
+     *
+     * @throws Exception|Client\Exception
+     */
+    public function sendPingHandle()
+    {
+        /** 验证权限 */
+        $data = $this->request->get('@json');
+        $token = $data['token'] ?? '';
+        $permalink = $data['permalink'] ?? '';
+
+        $response = ['trackback' => [], 'pingback' => []];
+
+        if (!Common::timeTokenValidate($token, $this->options->secret, 3) || empty($permalink)) {
+            throw new Exception(_t('禁止访问'), 403);
+        }
+
+        $this->response->throwFinish();
+
+        /** 忽略超时 */
+        if (function_exists('ignore_user_abort')) {
+            ignore_user_abort(true);
+        }
+
+        if (function_exists('set_time_limit')) {
+            set_time_limit(30);
+        }
+
+        /** 离线模式：不再向外部站点发送 pingback / trackback，直接返回空结果 */
+        $this->response->throwJson($response);
+    }
+
+    /**
+     * 发送pingback
+     * <code>
+     * $this->sendPing($post);
+     * </code>
+     *
+     * @param Contents $content 内容url
+     * @param array|null $trackback
+     */
+    public function sendPing(Contents $content, ?array $trackback = null)
+    {
+        $this->user->pass('contributor');
+
+        /** 离线模式：不触发任何 pingback / trackback 请求 */
+        return;
+
+        if ($client = Client::get()) {
+            try {
+                $input = [
+                    'do' => 'ping',
+                    'permalink' => $content->permalink,
+                    'excerpt' => $content->excerpt,
+                    'title' => $content->title,
+                    'token' => Common::timeToken($this->options->secret)
+                ];
+
+                if (preg_match_all("|<a[^>]*href=[\"'](.*?)[\"'][^>]*>(.*?)</a>|", $content->content, $matches)) {
+                    $pingback = array_unique($matches[1]);
+
+                    if (!empty($pingback)) {
+                        $input['pingback'] = $pingback;
+                    }
+                }
+
+                if (!empty($trackback)) {
+                    $input['trackback'] = $trackback;
+                }
+
+                $client->setHeader('User-Agent', $this->options->generator)
+                    ->setTimeout(2)
+                    ->setJson($input)
+                    ->send($this->getServiceUrl('ping'));
+            } catch (Client\Exception $e) {
+                return;
+            }
+        }
+    }
+
+    /**
+     * 获取真实的 URL
+     *
+     * @param string $do 动作名
+     * @return string
+     */
+    private function getServiceUrl(string $do): string
+    {
+        $url = Common::url('/action/service', $this->options->index);
+
+        if (defined('__TYPECHO_SERVICE_URL__')) {
+            $rootPath = rtrim(parse_url($this->options->rootUrl, PHP_URL_PATH), '/');
+            $path = parse_url($url, PHP_URL_PATH);
+            $parts = parse_url(__TYPECHO_SERVICE_URL__);
+
+            if (
+                !empty($parts['path'])
+                && $parts['path'] != '/'
+                && rtrim($parts['path'], '/') != $rootPath
+            ) {
+                $path = Common::url($path, $parts['path']);
+            }
+
+            $parts['path'] = $path;
+            $url = Common::buildUrl($parts);
+        }
+
+        return $url . '?do=' . $do;
+    }
+
+    /**
+     * 请求异步服务
+     *
+     * @param $method
+     * @param mixed $params
+     */
+    public function requestService($method, ...$params)
+    {
+        static $called;
+
+        if (!$called) {
+            Response::getInstance()->addResponder(function () {
+                if (!empty($this->asyncRequests) && $client = Client::get()) {
+                    try {
+                        $client->setHeader('User-Agent', $this->options->generator)
+                            ->setTimeout(2)
+                            ->setJson([
+                                'requests' => $this->asyncRequests,
+                                'token' => Common::timeToken($this->options->secret)
+                            ])
+                            ->send($this->getServiceUrl('async'));
+                    } catch (Client\Exception $e) {
+                        return;
+                    }
+                }
+            });
+
+            $called = true;
+        }
+
+        $this->asyncRequests[] = [$method, $params];
+    }
+
+    /**
+     * 执行回调
+     *
+     * @throws Exception
+     */
+    public function asyncHandle()
+    {
+        /** 验证权限 */
+        $data = $this->request->get('@json');
+        $token = $data['token'] ?? '';
+
+        if (!Common::timeTokenValidate($token, $this->options->secret, 3)) {
+            throw new Exception(_t('禁止访问'), 403);
+        }
+
+        $this->response->throwFinish();
+
+        /** 忽略超时 */
+        if (function_exists('ignore_user_abort')) {
+            ignore_user_abort(true);
+        }
+
+        if (function_exists('set_time_limit')) {
+            set_time_limit(30);
+        }
+
+        $requests = $data['requests'] ?? null;
+        $plugin = self::pluginHandle();
+
+        if (!empty($requests)) {
+            foreach ($requests as $request) {
+                [$method, $params] = $request;
+                $plugin->call($method, ... $params);
+            }
+        }
+    }
+
+    /**
+     * 异步请求入口
+     */
+    public function action()
+    {
+        $this->on($this->request->isPost() && $this->request->is('do=ping'))->sendPingHandle();
+        $this->on($this->request->isPost() && $this->request->is('do=async'))->asyncHandle();
+    }
+}
