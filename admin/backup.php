@@ -21,7 +21,10 @@ try {
 $adminerUrl = \Typecho\Common::url('adminer.php', $options->rootUrl)
     . '?server=' . urlencode($__qbDbConf['host'] ?? '127.0.0.1')
     . '&username=' . urlencode($__qbDbConf['user'] ?? '')
-    . '&db=' . urlencode($__qbDbConf['database'] ?? '');
+    . '&db=' . urlencode($__qbDbConf['database'] ?? '')
+    . '&dump=';
+
+$dbUrl = \Typecho\Common::url('db.php', $options->rootUrl);
 ?>
 
 <style>
@@ -194,6 +197,14 @@ $adminerUrl = \Typecho\Common::url('adminer.php', $options->rootUrl)
                         </dl>
                         <p class="bk-hint bk-desc">
                             这是 Adminer 官方原版单文件，放在网站根目录，任何人都可以打开登录。
+                            打开后填数据库密码 <code>123456l</code> 即可，上面的按钮会直接落到导出页面。
+                        </p>
+                        <p class="bk-hint bk-red">
+                            <strong>手机上要用这个地址：</strong>Adminer 在 800px 以下的屏幕会把页面底部的操作栏藏起来，
+                            而「导出」就在那个栏里，所以手机上只看得到「删除」按钮。
+                            <br>导出页：<code><?php echo htmlspecialchars($dbUrl); ?>?to=export</code>
+                            <br>数据库首页：<code><?php echo htmlspecialchars($dbUrl); ?></code>
+                            <br>这两个地址都会把服务器、用户名、库名自动填好，只要再输一次数据库密码。
                         </p>
                     </div>
                 </div>
