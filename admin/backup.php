@@ -294,7 +294,7 @@ $dbUrl = \Typecho\Common::url('db.php', $options->rootUrl);
                     <ul>
                         <li><code>usr/uploads/</code> 已上传的图片、附件等<strong>所有媒体文件</strong>；</li>
                         <li><code>usr/themes/</code> 主题文件、<code>usr/plugins/</code> 插件文件（只备份主题名和插件清单，不备份文件本身）；</li>
-                        <li>站点根目录的 <code>favicon.ico</code>、<code>apple-touch-icon.png</code> 等图标文件；</li>
+                        <li>站点根目录的 <code>apple-touch-icon.svg</code> 图标文件；</li>
                         <li><code>config.inc.php</code>（数据库地址、账号、密码、表前缀等连接配置）。</li>
                     </ul>
 

@@ -12,13 +12,12 @@
             'author'   => _t('%s 发布的文章')
         ], '', ' - '); ?><?php $this->options->title(); ?></title>
 
-    <!-- 站点图标（引用站点根目录，地址由 siteUrl 动态生成，迁移后自动跟随）
+    <!-- 站点图标：只用矢量 SVG，不保留 PNG / ICO
+         矢量图任意尺寸都清晰，浏览器标签页 / 书签 / 手机主屏共用一个文件
          ?v= 取图标文件的修改时间，浏览器换新图标后会自动重新拉取，不会被旧缓存卡住 -->
-    <?php $__iconVer = @filemtime(__TYPECHO_ROOT_DIR__ . '/favicon.ico') ?: time(); ?>
-    <link rel="icon" type="image/png" sizes="32x32" href="<?php $this->options->siteUrl('favicon-32x32.png'); ?>?v=<?php echo $__iconVer; ?>">
-    <link rel="icon" type="image/x-icon" sizes="any" href="<?php $this->options->siteUrl('favicon.ico'); ?>?v=<?php echo $__iconVer; ?>">
-    <link rel="shortcut icon" type="image/x-icon" href="<?php $this->options->siteUrl('favicon.ico'); ?>?v=<?php echo $__iconVer; ?>">
-    <link rel="apple-touch-icon" sizes="180x180" href="<?php $this->options->siteUrl('apple-touch-icon.png'); ?>?v=<?php echo $__iconVer; ?>">
+    <?php $__iconVer = @filemtime(__TYPECHO_ROOT_DIR__ . '/apple-touch-icon.svg') ?: time(); ?>
+    <link rel="icon" type="image/svg+xml" href="<?php $this->options->siteUrl('apple-touch-icon.svg'); ?>?v=<?php echo $__iconVer; ?>">
+    <link rel="apple-touch-icon" href="<?php $this->options->siteUrl('apple-touch-icon.svg'); ?>?v=<?php echo $__iconVer; ?>">
 
     <!-- 使用url函数转换相关路径 -->
     <link rel="stylesheet" href="<?php $this->options->themeUrl('normalize.css'); ?>?v=20261010">

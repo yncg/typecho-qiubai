@@ -1,0 +1,50 @@
+/* ==========================================================================
+   后台顶栏精简（qiubai 自定义，加载在本文件里的最后一项，可覆盖 style.css）
+   左侧：只保留「控制台」一个按钮，点进去是功能总览
+   右侧：备份 / 账号名 / 登出 / 网站
+   ========================================================================== */
+
+.typecho-head-nav nav > menu > li.menu-console {
+    display: block;
+    order: 0;
+    flex: 0 0 auto;
+}
+
+.typecho-head-nav nav > menu > li.menu-console > a {
+    border-right: 1px solid #383D45;
+}
+
+.typecho-head-nav nav > menu > li.menu-console > a:hover,
+.typecho-head-nav nav > menu > li.menu-console > a:focus {
+    background: #202328;
+}
+
+/* 左上角第一个按钮不再需要左侧分隔线 */
+.typecho-head-nav nav > menu > li:first-child {
+    border-left: none;
+}
+
+/* 控制台页面的功能列表：项目变多了，收紧一点间距更好看 */
+#start-link li {
+    margin-bottom: 6px;
+}
+
+@media (max-width: 575px) {
+    /* 手机上 style.css 会把所有非 operate 项隐藏（原「菜单」折叠用），这里把「控制台」放出来 */
+    .typecho-head-nav nav > menu > li.menu-console {
+        display: block !important;
+        order: 0 !important;
+        flex: 0 0 auto !important;
+        border: none !important;
+    }
+
+    .typecho-head-nav nav > menu > li.menu-console > a {
+        padding: 0 14px;
+    }
+
+    /* 右上角四个功能在小屏上紧凑一些，避免账号名被挤掉 */
+    .typecho-head-nav nav > menu > li.operate a {
+        padding: 0 9px;
+        max-width: 26vw;
+    }
+}

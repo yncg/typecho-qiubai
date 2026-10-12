@@ -45,6 +45,35 @@ $stat = \Widget\Stat::alloc();
                             <li><a href="<?php $options->adminUrl('options-general.php'); ?>"><?php _e('系统设置'); ?></a>
                             </li>
                         <?php endif; ?>
+
+                        <?php /* ===== 以下为新增：原先要点右上角「菜单」才能看到的功能，全部搬到控制台这里 ===== */ ?>
+
+                        <?php if ($user->pass('editor', true)): ?>
+                            <li><a href="<?php $options->adminUrl('write-page.php'); ?>"><?php _e('创建页面'); ?></a></li>
+                        <?php endif; ?>
+
+                        <li><a href="<?php $options->adminUrl('manage-posts.php'); ?>"><?php _e('管理文章'); ?></a></li>
+
+                        <?php if ($user->pass('editor', true)): ?>
+                            <li><a href="<?php $options->adminUrl('manage-pages.php'); ?>"><?php _e('管理独立页面'); ?></a></li>
+                        <?php endif; ?>
+
+                        <li><a href="<?php $options->adminUrl('manage-comments.php'); ?>"><?php _e('管理评论'); ?></a></li>
+
+                        <?php if ($user->pass('editor', true)): ?>
+                            <li><a href="<?php $options->adminUrl('manage-categories.php'); ?>"><?php _e('管理分类'); ?></a></li>
+                            <li><a href="<?php $options->adminUrl('manage-tags.php'); ?>"><?php _e('管理标签'); ?></a></li>
+                            <li><a href="<?php $options->adminUrl('manage-medias.php'); ?>"><?php _e('管理文件'); ?></a></li>
+                        <?php endif; ?>
+
+                        <?php if ($user->pass('administrator', true)): ?>
+                            <li><a href="<?php $options->adminUrl('manage-users.php'); ?>"><?php _e('管理用户'); ?></a></li>
+                            <li><a href="<?php $options->adminUrl('options-discussion.php'); ?>"><?php _e('评论设置'); ?></a></li>
+                            <li><a href="<?php $options->adminUrl('options-reading.php'); ?>"><?php _e('阅读设置'); ?></a></li>
+                            <li><a href="<?php $options->adminUrl('options-permalink.php'); ?>"><?php _e('永久链接设置'); ?></a></li>
+                        <?php endif; ?>
+
+                        <li><a href="<?php $options->adminUrl('profile.php'); ?>"><?php _e('个人设置'); ?></a></li>
                     <?php endif; ?>
                     <!--<li><a href="<?php $options->adminUrl('profile.php'); ?>"><?php _e('更新我的资料'); ?></a></li>-->
                 </ul>

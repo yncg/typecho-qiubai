@@ -5,19 +5,17 @@ if (!defined('__TYPECHO_ADMIN__')) {
 
 $header = '<link rel="stylesheet" href="' . $options->adminStaticUrl('css', 'normalize.css', true) . '">
 <link rel="stylesheet" href="' . $options->adminStaticUrl('css', 'grid.css', true) . '">
-<link rel="stylesheet" href="' . $options->adminStaticUrl('css', 'style.css', true) . '">';
+<link rel="stylesheet" href="' . $options->adminStaticUrl('css', 'style.css', true) . '">
+<link rel="stylesheet" href="' . $options->adminStaticUrl('css', 'qiubai.css', true) . '">';
 
 /** 站点图标（后台也要显示，否则浏览器标签页上是空白图标）
+    只用矢量 SVG，不保留 PNG / ICO
     ?v= 取图标文件修改时间，换图后自动破缓存 */
-$__iconVer = @filemtime(__TYPECHO_ROOT_DIR__ . '/favicon.ico') ?: time();
-$header .= '<link rel="icon" type="image/png" sizes="32x32" href="'
-    . \Typecho\Common::url('favicon-32x32.png', $options->rootUrl) . '?v=' . $__iconVer . '">
-<link rel="icon" type="image/x-icon" sizes="any" href="'
-    . \Typecho\Common::url('favicon.ico', $options->rootUrl) . '?v=' . $__iconVer . '">
-<link rel="shortcut icon" type="image/x-icon" href="'
-    . \Typecho\Common::url('favicon.ico', $options->rootUrl) . '?v=' . $__iconVer . '">
-<link rel="apple-touch-icon" sizes="180x180" href="'
-    . \Typecho\Common::url('apple-touch-icon.png', $options->rootUrl) . '?v=' . $__iconVer . '">';
+$__iconVer = @filemtime(__TYPECHO_ROOT_DIR__ . '/apple-touch-icon.svg') ?: time();
+$header .= '<link rel="apple-touch-icon" href="'
+    . \Typecho\Common::url('apple-touch-icon.svg', $options->rootUrl) . '?v=' . $__iconVer . '">
+<link rel="icon" type="image/svg+xml" href="'
+    . \Typecho\Common::url('apple-touch-icon.svg', $options->rootUrl) . '?v=' . $__iconVer . '">';
 
 /** 注册一个初始化插件 */
 $header = \Typecho\Plugin::factory('admin/header.php')->filter('header', $header);
