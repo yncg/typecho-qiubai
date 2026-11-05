@@ -194,7 +194,6 @@ textarea {
   padding: 0;
   color: #999;
   font-size: .92857em;
-  overflow: hidden;
 }
 .post-meta li {
   display: inline-block;
@@ -207,32 +206,7 @@ textarea {
   padding-left: 0;
   border: none;
 }
-/* 列表页每篇文章的「编辑」按钮：靠右站最外层，蓝色，一眼能点 */
-.post-meta li.post-meta-edit {
-  float: right;
-  margin: 0;
-  padding: 0;
-  border: none;
-}
-.post-meta a.post-edit-btn {
-  display: inline-block;
-  padding: 1px 10px;
-  line-height: 1.7;
-  color: #FFF;
-  background-color: #467B96;
-  border: none;
-  border-radius: 3px;
-  text-decoration: none;
-  white-space: nowrap;
-}
-.post-meta a.post-edit-btn:hover,
-.post-meta a.post-edit-btn:focus {
-  color: #FFF;
-  background-color: #499BC3;
-  border-bottom-color: transparent;
-  text-decoration: none;
-}
-/* 详情页原有的「编辑」链接改成红色 */
+/* 「编辑」链接：列表页和详情页同一位置、同样式，红色 */
 .post-meta a.post-edit-link {
   color: #D0342C;
 }

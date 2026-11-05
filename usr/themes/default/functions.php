@@ -50,11 +50,8 @@ function postMeta(
             // 第二个参数 true 表示返回字符串，不传会直接输出到页面
             $editUrl = \Widget\Options::alloc()->adminUrl('write-post.php', true) . '?cid=' . $archive->cid;
             ?>
-            <?php if ($metaType == 'post'): ?>
-                <li><a class="post-edit-link" href="<?php echo $editUrl; ?>"><?php _e('编辑'); ?></a></li>
-            <?php else: ?>
-                <li class="post-meta-edit"><a class="post-edit-btn" href="<?php echo $editUrl; ?>"><?php _e('编辑'); ?></a></li>
-            <?php endif; ?>
+            <?php /* 列表页与详情页同一个位置、同一个样式：分类后面跟一个红色「编辑」 */ ?>
+            <li><a class="post-edit-link" href="<?php echo $editUrl; ?>" style="color:#D0342C"><?php _e('编辑'); ?></a></li>
         </ul>
     <?php endif; ?>
 <?php
