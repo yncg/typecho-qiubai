@@ -47,4 +47,10 @@
         padding: 0 9px;
         max-width: 26vw;
     }
+
+    /* 写文章的主编辑框：桌面端 350px 在手机上太高，
+       压到 200px，输入框和上方那排小按钮（加粗/T/Red/Pur）就能同屏，不用再往上划 */
+    #text {
+        height: 200px !important;
+    }
 }

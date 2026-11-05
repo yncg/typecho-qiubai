@@ -46,8 +46,14 @@ function postMeta(
                 <time datetime="<?php $archive->date('c'); ?>" itemprop="datePublished"><?php $archive->date(); ?></time>
             </li>
             <li><?php _e('分类'); ?>: <?php $archive->category(','); ?></li>
+            <?php
+            // 第二个参数 true 表示返回字符串，不传会直接输出到页面
+            $editUrl = \Widget\Options::alloc()->adminUrl('write-post.php', true) . '?cid=' . $archive->cid;
+            ?>
             <?php if ($metaType == 'post'): ?>
-                <li><a href="<?php \Widget\Options::alloc()->adminUrl('write-post.php'); ?>?cid=<?php echo $archive->cid; ?>"><?php _e('编辑'); ?></a></li>
+                <li><a class="post-edit-link" href="<?php echo $editUrl; ?>"><?php _e('编辑'); ?></a></li>
+            <?php else: ?>
+                <li class="post-meta-edit"><a class="post-edit-btn" href="<?php echo $editUrl; ?>"><?php _e('编辑'); ?></a></li>
             <?php endif; ?>
         </ul>
     <?php endif; ?>
