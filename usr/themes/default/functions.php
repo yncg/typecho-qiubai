@@ -36,7 +36,7 @@ function postMeta(
 {
     $titleTag = $metaType == 'archive' ? 'h2' : 'h1';
 ?>
-    <<?php echo $titleTag ?> class="post-title" itemprop="name headline">
+    <<?php echo $titleTag ?> class="post-title"<?php echo $metaType == 'archive' ? ' style="text-align:center"' : ''; ?> itemprop="name headline">
         <a itemprop="url"
            href="<?php $archive->permalink() ?>"><?php $archive->title() ?></a>
     </<?php echo $titleTag ?>>

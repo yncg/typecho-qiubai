@@ -189,6 +189,10 @@ textarea {
   margin: .83em 0;
   font-size: 1.4em;
 }
+/* 列表页的文章标题居中（文末 #main * 把全站强制左对齐了，这里用更高权重覆盖） */
+#main h2.post-title {
+  text-align: center;
+}
 .post-meta {
   margin-top: -0.5em;
   padding: 0;
