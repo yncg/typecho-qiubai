@@ -196,6 +196,9 @@ $(document).ready(function () {
         // 1) 移除 加粗 / 斜体 / 链接 / 引用 四个按钮
         $('#wmd-bold-button, #wmd-italic-button, #wmd-link-button, #wmd-quote-button').remove();
 
+        // 1.2) 移除 有序列表 / 无序列表 两个按钮
+        $('#wmd-olist-button, #wmd-ulist-button').remove();
+
         // 1.1) 同时屏蔽 Ctrl+B / Ctrl+I / Ctrl+L / Ctrl+Q 快捷键（pagedown 仍保留这些命令）
         textarea.get(0).addEventListener('keydown', function (e) {
             if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey) {
@@ -434,6 +437,12 @@ $(document).ready(function () {
                 wrapWithTag('<font color="purple">', '</font>');
             });
 
+        addButton('wmd-bold2-button', 'B', '<?php _e('加粗（**文字**）'); ?>', '#444',
+            function () {
+                // 选中内容时用 ** 包起来；没选中则插入 **** 并把光标停在第二个星号之后
+                wrapWithTag('**', '**');
+            });
+
         // 8) 新建文章时，正文开头自动插入当前详细日期，并把光标落到下一行
         const isNewPost = <?php echo json_encode(!empty($post) && !$content->have()); ?>;
 
@@ -458,34 +467,12 @@ $(document).ready(function () {
             Typecho.insertFileToEditor(attachment.title, attachment.url, attachment.isImage);
         };
 
-        // 编辑预览切换：右上角原来的「预览」已改成「发布」
-        const edittab = $('.editor').append('<div class="wmd-edittab"><a href="#wmd-editarea" class="active"><?php _e('撰写'); ?></a><a href="#wmd-publish" class="wmd-publish"><?php _e('发布'); ?></a></div>'),
+        // 右上角只保留「发布」：等同于点底部的「发布文章」按钮
+        const edittab = $('.editor').append('<div class="wmd-edittab"><a href="#wmd-publish" class="wmd-publish"><?php _e('发布'); ?></a></div>'),
             editarea = $(textarea.parent()).attr("id", "wmd-editarea");
 
-        // 右上角「发布」：等同于点底部的「发布文章」按钮
         $(".wmd-edittab a.wmd-publish").click(function () {
             $('#btn-submit').trigger('click');
-            return false;
-        });
-
-        $(".wmd-edittab a").not(".wmd-publish").click(function() {
-            $(".wmd-edittab a").removeClass('active');
-            $(this).addClass("active");
-            $("#wmd-editarea, #wmd-preview").addClass("wmd-hidetab");
-        
-            const selected_tab = $(this).attr("href"),
-                selected_el = $(selected_tab).removeClass("wmd-hidetab");
-
-            // 预览时隐藏编辑器按钮
-            if (selected_tab === "#wmd-preview") {
-                $("#wmd-button-row").addClass("wmd-visualhide");
-            } else {
-                $("#wmd-button-row").removeClass("wmd-visualhide");
-            }
-
-            // 预览和编辑窗口高度一致
-            $("#wmd-preview").outerHeight($("#wmd-editarea").innerHeight());
-
             return false;
         });
 

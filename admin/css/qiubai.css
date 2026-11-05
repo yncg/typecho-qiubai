@@ -55,15 +55,18 @@
     }
 }
 
-/* 编辑框右上角：原来的「预览」改成「发布」，做成按钮样式，一眼能看出是提交 */
+/* 编辑框右上角：原来的「预览」改成「发布」，红字白底，一眼能看出是提交 */
 #wmd-button-bar .wmd-edittab a.wmd-publish {
-    color: #FFF;
-    background: #467B96;
+    color: #D0342C;
+    background: #FFF;
+    border: 1px solid #D9D9D6;
     border-radius: 2px;
+    box-sizing: border-box;
 }
 
 #wmd-button-bar .wmd-edittab a.wmd-publish:hover,
 #wmd-button-bar .wmd-edittab a.wmd-publish:focus {
-    color: #FFF;
-    background: #499BC3;
+    color: #A82720;
+    background: #FFF;
+    border-color: #D0342C;
 }
