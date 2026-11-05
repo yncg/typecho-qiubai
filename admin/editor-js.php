@@ -458,11 +458,17 @@ $(document).ready(function () {
             Typecho.insertFileToEditor(attachment.title, attachment.url, attachment.isImage);
         };
 
-        // 编辑预览切换
-        const edittab = $('.editor').append('<div class="wmd-edittab"><a href="#wmd-editarea" class="active"><?php _e('撰写'); ?></a><a href="#wmd-preview"><?php _e('预览'); ?></a></div>'),
+        // 编辑预览切换：右上角原来的「预览」已改成「发布」
+        const edittab = $('.editor').append('<div class="wmd-edittab"><a href="#wmd-editarea" class="active"><?php _e('撰写'); ?></a><a href="#wmd-publish" class="wmd-publish"><?php _e('发布'); ?></a></div>'),
             editarea = $(textarea.parent()).attr("id", "wmd-editarea");
 
-        $(".wmd-edittab a").click(function() {
+        // 右上角「发布」：等同于点底部的「发布文章」按钮
+        $(".wmd-edittab a.wmd-publish").click(function () {
+            $('#btn-submit').trigger('click');
+            return false;
+        });
+
+        $(".wmd-edittab a").not(".wmd-publish").click(function() {
             $(".wmd-edittab a").removeClass('active');
             $(this).addClass("active");
             $("#wmd-editarea, #wmd-preview").addClass("wmd-hidetab");

@@ -54,3 +54,16 @@
         height: 200px !important;
     }
 }
+
+/* 编辑框右上角：原来的「预览」改成「发布」，做成按钮样式，一眼能看出是提交 */
+#wmd-button-bar .wmd-edittab a.wmd-publish {
+    color: #FFF;
+    background: #467B96;
+    border-radius: 2px;
+}
+
+#wmd-button-bar .wmd-edittab a.wmd-publish:hover,
+#wmd-button-bar .wmd-edittab a.wmd-publish:focus {
+    color: #FFF;
+    background: #499BC3;
+}
