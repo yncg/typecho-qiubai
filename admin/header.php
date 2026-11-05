@@ -5,8 +5,8 @@ if (!defined('__TYPECHO_ADMIN__')) {
 
 $header = '<link rel="stylesheet" href="' . $options->adminStaticUrl('css', 'normalize.css', true) . '">
 <link rel="stylesheet" href="' . $options->adminStaticUrl('css', 'grid.css', true) . '">
-<link rel="stylesheet" href="' . $options->adminStaticUrl('css', 'style.css', true) . '">
-<link rel="stylesheet" href="' . $options->adminStaticUrl('css', 'qiubai.css', true) . '">';
+<link rel="stylesheet" href="' . $options->adminStaticUrl('css', 'style.css', true) . '?v=' . (@filemtime(__DIR__ . '/css/style.css') ?: time()) . '">
+<link rel="stylesheet" href="' . $options->adminStaticUrl('css', 'qiubai.css', true) . '?v=' . (@filemtime(__DIR__ . '/css/qiubai.css') ?: time()) . '">';
 
 /** 站点图标（后台也要显示，否则浏览器标签页上是空白图标）
     只用矢量 SVG，不保留 PNG / ICO

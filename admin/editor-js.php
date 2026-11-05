@@ -193,8 +193,8 @@ $(document).ready(function () {
 
         // ===== 工具栏自定义改造 开始 =====
 
-        // 1) 移除 加粗 / 斜体 / 链接 / 引用 四个按钮
-        $('#wmd-bold-button, #wmd-italic-button, #wmd-link-button, #wmd-quote-button').remove();
+        // 1) 移除 加粗 / 斜体 / 链接 / 引用 / 代码 五个按钮
+        $('#wmd-bold-button, #wmd-italic-button, #wmd-link-button, #wmd-quote-button, #wmd-code-button').remove();
 
         // 1.2) 移除 有序列表 / 无序列表 两个按钮
         $('#wmd-olist-button, #wmd-ulist-button').remove();

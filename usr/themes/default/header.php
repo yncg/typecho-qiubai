@@ -22,7 +22,8 @@
     <!-- 使用url函数转换相关路径 -->
     <link rel="stylesheet" href="<?php $this->options->themeUrl('normalize.css'); ?>?v=20261010">
     <link rel="stylesheet" href="<?php $this->options->themeUrl('grid.css'); ?>?v=20261010">
-    <link rel="stylesheet" href="<?php $this->options->themeUrl('style.css'); ?>?v=20261010b">
+    <!-- ?v= 取文件修改时间，改样式后自动破缓存，不用手动改版本号 -->
+    <link rel="stylesheet" href="<?php $this->options->themeUrl('style.css'); ?>?v=<?php echo @filemtime(__DIR__ . '/style.css') ?: time(); ?>">
 
     <!-- 通过自有函数输出HTML头部信息 -->
     <?php $this->header(); ?>
